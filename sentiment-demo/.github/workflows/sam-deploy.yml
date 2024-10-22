@@ -1,34 +1,24 @@
-name: Deploy Lambda Function
-
 on:
   push:
     branches:
       - main
 
+defaults:
+  run:
+    working-directory: ./sentiment-demo
+
 jobs:
-  build-and-deploy:
+  build-deploy:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up AWS CLI
-        uses: aws-actions/configure-aws-credentials@v1
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - uses: aws-actions/setup-sam@v1
+      - uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
-
-      - name: Install SAM CLI
-        run: |
-          pip install aws-sam-cli
-
-      - name: Build the Lambda function
-        run: |
-          sam build
-
-      - name: Deploy the Lambda function
-        run: |
-          sam deploy --stack-name sam-sentiment-anna --capabilities CAPABILITY_IAM --no-confirm-changeset
+      - run: sam build --use-container
+      - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset --stack-name sam-sentiment-anna --s3-bucket lambda-bucket-grb --capabilities CAPABILITY_IAM --region eu-west-1
 
