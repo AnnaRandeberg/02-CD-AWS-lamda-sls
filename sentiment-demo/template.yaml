@@ -61,3 +61,5 @@ Outputs:
   SentimentFunctionIamRole:
     Description: "Implicit IAM Role created for Hello World function"
     Value: !GetAtt LambdaRole.Arn
+# Dette er en endring for å teste GitHub Actions
+
